@@ -1,14 +1,22 @@
 require("dotenv").config();
-const http = require("http");
+const express = require("express");
+const os = require("os");
 
 const appName = process.env.APP_NAME || "sample-brimble-app";
-const port = process.env.PORT || 3000;
+const port = Number(process.env.PORT) || 3000;
 
-http
-  .createServer((_, res) => {
-    res.writeHead(200, { "Content-Type": "text/plain" });
-    res.end(
-      `Hello from brimble deployment. App Name: ${appName} Host: ${require("os").hostname()} on port ${port}\n`,
-    );
-  })
-  .listen(port, () => console.log(`listening on ${port}`));
+const app = express();
+
+app.get("/health", (_req, res) => {
+  res.status(200).json({ ok: true });
+});
+
+app.get("/", (_req, res) => {
+  res.type("text/plain").send(
+    `Hello from brimble deployment. App Name: ${appName} Host: ${os.hostname()} on port ${port}\n`,
+  );
+});
+
+app.listen(port, () => {
+  console.log(`listening on ${port}`);
+});
